@@ -14,7 +14,6 @@ const courses = [
 
 const Joi = require('joi'); // Validation package - returns a class Joi
 const express = require('express');
-const { reset } = require('nodemon');
 const app = express();
 
 // enable parsing of JSON objects in body of request
@@ -34,12 +33,8 @@ app.get('/api/courses/:id', (req, res) => {
 });
 
 app.post('/api/courses', (req, res) => {
-    const schema = Joi.object({
-        name: Joi.string().min(3).required(),
-    });
-
-    const result = schema.validate(req.body);
-    if (result.error) {
+    const { error } = validateCourse(req.body);
+    if (error) {
         res.status(400).send(result.error.details[0].message);
         return;
     }
@@ -55,12 +50,8 @@ app.put('/api/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
     if (!course) res.status(404).send('404 Not Found!');
 
-    const schema = Joi.object({
-        name: Joi.string().min(3).required(),
-    });
-
-    const result = schema.validate(req.body);
-    if (result.error) {
+    const { error } = validateCourse(req.body);
+    if (error) {
         res.status().send(result.error.details[0].message);
         return;
     }
@@ -68,6 +59,14 @@ app.put('/api/courses/:id', (req, res) => {
     course.name = req.body.name;
     res.send(course);
 });
+
+function validateCourse(course) {
+    const schema = Joi.object({
+        name: Joi.string().min(3).required(),
+    });
+
+    return schema.validate(course);
+}
 
 app.listen(port, (req, res) => {
     console.log(`Listening on port ${port}`);
