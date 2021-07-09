@@ -20,11 +20,11 @@ const app = express();
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send('Index');
+    return res.send('Index');
 });
 
 app.get('/api/courses', (req, res) => {
-    res.send(courses);
+    return res.send(courses);
 });
 
 app.get('/api/courses/:id', (req, res) => {
@@ -38,21 +38,21 @@ app.post('/api/courses', (req, res) => {
 
     const course = {
         id: courses.length+1,
-        name: req.body.name
+        name: req.body.name,
     }
     courses.push(course);
-    res.status(201).send(course)
+    return res.status(201).send(course);
 });
 
 app.put('/api/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
-    if (!course) res.status(404).send('404 Not Found!');
+    if (!course) return res.status(404).send('404 Not Found!');
 
     const { error } = validateCourse(req.body);
     if (error) return res.status(200).send(error.details[0].message);
 
     course.name = req.body.name;
-    res.send(course);
+    return res.send(course);
 });
 
 app.delete('/api/courses/:id', (req, res) => {
@@ -62,7 +62,7 @@ app.delete('/api/courses/:id', (req, res) => {
     const index = courses.indexOf(course);
     courses.splice(index, 1);
 
-    res.status(204).send(course);
+    return res.status(204).send(course);
 });
 
 function validateCourse(course) {
