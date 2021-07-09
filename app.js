@@ -15,6 +15,9 @@ const courses = [
 const express = require('express');
 const app = express();
 
+// enable parsing of JSON objects in body of request
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
@@ -24,8 +27,23 @@ app.get('/api/courses', (req, res) => {
 });
 
 app.get('/api/courses/:id', (req, res) => {
-    res.send(courses[req.params.id-1]);
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    !course ? res.status(404).send('404 Not Found.') : res.send(course);
 });
+
+app.post('/api/courses', (req, res) => {
+    if (!req.body.name || req.body.name.length < 3) {
+        res.status(400).send('400 Bad Request.');
+        return;
+    }
+    const course = {
+        id: courses.length+1,
+        name: req.body.name
+    }
+    courses.push(course);
+    res.status(201).send(course)
+});
+
 
 app.listen(port, (req, res) => {
     console.log(`Listening on port ${port}`);
