@@ -29,7 +29,7 @@ app.get('/api/courses', (req, res) => {
 
 app.get('/api/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
-    !course ? res.status(404).send('404 Not Found!') : res.send(course);
+    return !course ? res.status(404).send('404 Not Found!') : res.send(course);
 });
 
 app.post('/api/courses', (req, res) => {
